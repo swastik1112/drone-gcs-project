@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drone Ground Control Station</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Drone Ground Control Station</h1>
+        </header>
+
+        <section id="telemetry">
+            <div class="data">
+                <p><strong>GPS Coordinates:</strong> Lat:<span id="lat"> 40.7128</span>, Lon:<span id="lon"> -74.0060</span></p>
+            </div>
+            <div class="data">
+                <p><strong>Altitude:</strong> <span id="altitude">120</span> meters</p>
+            </div>
+            <div class="data">
+                <p><strong>Battery Voltage:</strong> <span id="battery">95</span> V</p>
+            </div>
+        </section>
+
+        <section id="input-section">
+            <label for="altitudeInput">Change Altitude:</label>
+            <input type="number" id="altitudeInput" placeholder="Enter new altitude (meters)">
+            <button onclick="updateAltitude()">Update Altitude</button>
+        </section>
+
+        <footer>
+            <p>&copy; 2025 Drone GCS Dashboard</p>
+        </footer>
+    </div>
+
+<script>
+    const backendUrl = 'http://127.0.0.1:5000';
+
+
+    function fetchTelemetryData() {
+        fetch(`${backendUrl}/telemetry`)
+            .then(response => response.json())
+            .then(data => {
+          
+                document.getElementById('lat').textContent = data.gps?.lat ?? 'undefined';
+                document.getElementById('lon').textContent = data.gps?.lon ?? 'undefined';
+
+                document.getElementById('altitude').textContent = data.altitude?.meters ?? 'undefined';
+
+                document.getElementById('battery').textContent = data.battery?.voltage ?? 'undefined';
+            })
+            .catch(err => console.error('Error fetching telemetry data:', err));
+    }
+
+
+    function updateAltitude() {
+        const altitudeInput = document.getElementById('altitudeInput').value;
+        
+        if (altitudeInput) {
+ 
+            fetch(`${backendUrl}/update-altitude`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ altitude: altitudeInput })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Altitude updated successfully:', data);
+ 
+                fetchTelemetryData();
+            })
+            .catch(err => console.error('Error updating altitude:', err));
+        }
+    }
+
+
+    window.onload = fetchTelemetryData;
+</script>
+</body>
+</html>
