@@ -1,5 +1,5 @@
 Clone the repository:
-git clone https://github.com/your-username/drone-gcs-project.git
+git clone https://github.com/swastik1112/drone-gcs-project.git
 cd drone-gcs-project
 
 Install dependencies:
